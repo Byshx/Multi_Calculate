@@ -8,6 +8,7 @@ public class QuickSort extends Sort implements Runnable {
 	private CountDownLatch countDownLatch = null;
 	private int[] array;
 	private int loc1, loc2;
+	private boolean running = true;
 
 	public QuickSort(CountDownLatch countDownLatch, int[] array, int loc1, int loc2) {
 		// TODO Auto-generated constructor stub
@@ -20,7 +21,7 @@ public class QuickSort extends Sort implements Runnable {
 	public void sort() {
 		ArrayList<Node> arrayList = new ArrayList<Node>();
 		arrayList.add(new Node(loc1, loc2));
-		while (!arrayList.isEmpty()) {
+		while (!arrayList.isEmpty() && running) {
 			Node node = arrayList.remove(0);
 			int l = node.loc1;
 			int r = node.loc2;
@@ -28,7 +29,7 @@ public class QuickSort extends Sort implements Runnable {
 			int right = r;
 			if (l < r) {
 				int k = array[left];
-				while (left < right) {
+				while (left < right && running) {
 					while (left < right && array[right] >= k) {
 						right--;
 					}
@@ -66,5 +67,9 @@ public class QuickSort extends Sort implements Runnable {
 		// TODO Auto-generated method stub
 		sort();
 		countDownLatch.countDown();
+	}
+	
+	public void Stop() {
+		running = false;
 	}
 }

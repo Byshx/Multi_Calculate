@@ -7,6 +7,7 @@ public class MergingSort extends Sort { // πÈ≤¢≈≈–Ú
 	private CountDownLatch countDownLatch = null;
 	private int[] array;
 	private int loc1, loc2;
+	private boolean running = true;
 
 	public MergingSort(CountDownLatch countDownLatch, int[] array, int loc1, int loc2) {
 		// TODO Auto-generated constructor stub
@@ -30,9 +31,9 @@ public class MergingSort extends Sort { // πÈ≤¢≈≈–Ú
 	public void sort2(int loc1, int loc2) {
 		int length = loc2 - loc1 + 1;
 		int k = 1;
-		while (k < length) {
+		while (k < length && running) {
 			int i = 0;
-			for (; i < length - k; i += k) {
+			for (; i < length - k && running == true; i += k) {
 				Merge(i, i + k / 2, i + k);
 			}
 			if (i - k + 1 != length) {
@@ -72,8 +73,11 @@ public class MergingSort extends Sort { // πÈ≤¢≈≈–Ú
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		sort2(loc1, loc2);
+		sort2(loc1, loc2);		
 		countDownLatch.countDown();
 	}
 
+	public void Stop() {
+		running = false;
+	}
 }

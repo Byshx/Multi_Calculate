@@ -7,6 +7,7 @@ public class BubbleSort extends Sort{
 	private CountDownLatch countDownLatch = null;
 	private int[] array;
 	private int loc1, loc2;
+	private boolean running = true;
 
 	public BubbleSort(CountDownLatch countDownLatch, int[] array, int loc1, int loc2) {
 		// TODO Auto-generated constructor stub
@@ -17,9 +18,9 @@ public class BubbleSort extends Sort{
 	}
 
 	public void sort() {
-		for (int i = loc2 - 1; i >= loc1; i--) {
+		for (int i = loc2 - 1; i >= loc1 && running; i--) {
 			boolean b = false;
-			for (int j = 0; j < i; j++) {
+			for (int j = 0; j < i && running; j++) {
 				if (array[j] > array[j + 1]) {
 					swap(array, j, j + 1);
 					b = true;
@@ -42,5 +43,9 @@ public class BubbleSort extends Sort{
 		sort();
 		countDownLatch.countDown();
 	}	
+	
+	public void Stop() {
+		running = false;
+	}
 
 }

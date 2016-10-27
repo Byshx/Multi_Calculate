@@ -10,8 +10,7 @@ public class GetXYData {
 
 	@SuppressWarnings("rawtypes")
 	protected XYChart.Series series = new XYChart.Series();
-	@SuppressWarnings("rawtypes")
-	private LineChart linechart = null;
+	private LineChart<Number, Number> linechart = null;
 
 	@SuppressWarnings({ "unchecked" })
 
@@ -41,10 +40,11 @@ public class GetXYData {
 
 	public void Clear() {
 
-		// ？？？
+		// 涉及到一个未明白的问题，直接Clear会报错
 		linechart.setAnimated(false);
 		series.getData().clear();
 		linechart.setAnimated(true);
+		linechart.getData().removeAll(linechart.getData());
 	}
 
 }
