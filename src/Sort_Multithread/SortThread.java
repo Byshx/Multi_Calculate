@@ -36,6 +36,7 @@ public class SortThread {
 		Sort[] objects = null;
 		Class c = null;
 		try {
+			//使用反射，用类的名称创建实例，有包的话需带上包名，如下“Sort_Multithread.类名”
 			c = Class.forName("Sort_Multithread." + method);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -46,12 +47,16 @@ public class SortThread {
 			countDownLatch = new CountDownLatch(thread);
 			threads = new Thread[size];
 		} else {
+			
 			objects = (Sort[]) Array.newInstance(c, size + 1);
 			countDownLatch = new CountDownLatch(thread);
 			threads = new Thread[size + 1];
 		}
+		//含参数的构造器，需用以下反射方法来调用
 		Class[] paramTypes = { CountDownLatch.class, int[].class, int.class, int.class };
 		Object[] params = { countDownLatch, array, 0, 0 };
+		
+		//使用容器装载参数
 		Constructor constructor = null;
 		try {
 			constructor = c.getConstructor(paramTypes);
@@ -74,6 +79,7 @@ public class SortThread {
 				params[2] = start;
 				params[3] = start + part;
 				start += part;
+				//产生多个实例
 				objects[i] = (Sort) constructor.newInstance(params);
 				threads[i] = new Thread(objects[i]);
 				threads[i].start();
@@ -145,7 +151,8 @@ public class SortThread {
 			k *= 2;
 		}
 	}
-
+	
+	//归并方法
 	private static void Merge(int[] number, int i, int mid, int j) {
 		int[] tmp = new int[j - i + 1];
 		int tmpi = i, tmpj = mid + 1;

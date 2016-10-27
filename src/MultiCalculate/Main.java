@@ -26,13 +26,19 @@ import javafx.application.Platform;
 
 @SuppressWarnings("restriction")
 public class Main extends Application {
-
+	
+	
 	private final NumberAxis xAxis = new NumberAxis();
 	private final NumberAxis yAxis = new NumberAxis();
 	protected LineChart<Number, Number> lineChart = new LineChart<Number, Number>(xAxis, yAxis);
+	
+	
+	//创建获取数据节点的类
 	private GetXYData getData = new GetXYData(this);
+	//创建多线程排序类
 	private SortThread sortthread = new SortThread(getData);
 	@SuppressWarnings("unused")
+	//创建多线程矩阵计算类
 	private CalculateThread calcuthread = new CalculateThread(getData);
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -62,7 +68,7 @@ public class Main extends Application {
 
 		// 设置按钮 添加图片
 
-		Image image = new Image(getClass().getResourceAsStream("calculate.png"));
+		Image image = new Image(getClass().getResourceAsStream("/MultiCalculate/icon/calculate.png"));
 		Button start = new Button("Start", new ImageView(image));
 
 		// 设置单选框
@@ -145,7 +151,9 @@ public class Main extends Application {
 		DealAction(start, tg, tf_size, tf_block_1, tf_block_2, tf_increase, cb, pb, label, checkBox);
 
 		stage.setScene(scene);
-		stage.getIcons().add(new Image(Main.class.getResourceAsStream("Data.png")));
+		
+		//添加图标
+		stage.getIcons().add(new Image(Main.class.getResourceAsStream("/MultiCalculate/icon/Data.png")));
 		stage.show();
 	}
 
@@ -162,7 +170,11 @@ public class Main extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
+				
+				//每次点击需清空上一次折线图和数据
 				getData.Clear();
+				
+				//Button事件响应应单独使用一个线程，防止UI阻塞
 				ButtonTask buttonTask = new ButtonTask();
 				buttonTask.setParameters(tg, tf_size, tf_block_1, tf_block_2, tf_increase, cb, pb, label);
 				buttonTask.start();
@@ -218,6 +230,8 @@ public class Main extends Application {
 			if (tg.getSelectedToggle() == null)
 				return;
 			int size_dim = 0, block1 = 0, block2 = 0, increase = 0;
+			
+			//检查输入框中的输入是否合法(这里最好用正则表达式，排除中文及英文输入)
 			try {
 				size_dim = Integer.parseInt(tf_size.getText());
 				block1 = Integer.parseInt(tf_block_1.getText());
@@ -228,18 +242,31 @@ public class Main extends Application {
 				// TODO: handle exception
 				System.out.println("Error:" + e.getMessage());
 			}
-
+			
+			//输入为零不予响应
+			
 			if (size_dim == 0 || block1 == 0 || block2 == 0 || increase == 0)
 				return;
+			
+			//用以更新进度条的变量
 			double pro = block2 - block1;
+			
+			//输出最后折线的名称
 			String seriersName = "";
+			
+			//用到了枚举(接触较浅)
 			if (tg.getSelectedToggle().getUserData().toString().equals("M")) {
 				int i = block1;
 				int I = 0;
 				for (; i <= block2; i += increase, I += increase) {
 					CalculateThread.setConfig(size_dim, i);
 					CalculateThread.execute();
+					
+					//匿名类调用外部变量需要使用final来定义
 					final double tmpi = I;
+					
+					//用来更新UI界面的任务代码，需放在Platform中进行。
+					//还有一种办法是使用Task实现UI线程的异步执行
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
@@ -271,14 +298,18 @@ public class Main extends Application {
 				}
 				seriersName = method;
 			}
+			//匿名类调用外部变量时使用final
 			final String tmpName = seriersName;
+			
 			Platform.runLater(new Runnable() {
 
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
+					//设回Ready标签
 					label.setText("   Ready  ");
 					getData.series.setName(tmpName);
+					//设回-1 使进度条处于动态状态
 					pb.setProgress(-1);
 				}
 			});
